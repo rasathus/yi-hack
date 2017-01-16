@@ -59,8 +59,7 @@ log() {
 }
 
 get_config() {
-    key=$1
-    grep $1 /home/hd1/test/yi-hack.cfg  | cut -d"=" -f2
+    grep "^$1=" /home/hd1/test/yi-hack.cfg  | cut -d"=" -f2
 }
 
 
@@ -87,7 +86,13 @@ echo "$(get_config TIMEZONE)" > /etc/TZ
 
 ### get time is done after wifi configuration!
 
-
+# Regardless of network configuration, the Yi also listens on 192.168.1.128 using eth0
+# this can cause problems on the network if another device has that IP
+# `ifconfig eth0 down` doesn't seem to do anything except hide eth0 from `ifconfig` output
+# so manually remove the configured IP by setting it to 0.0.0.0
+log "Disabling eth0"
+ifconfig eth0 0.0.0.0
+ifconfig eth0 down
 
 ### first, let's do as the orignal script does....
 
@@ -114,8 +119,8 @@ cd /home/3518
 himm 0x20050074 0x06802424
 
 ### Let ppl hear that we start
-/home/rmm "/home/hd1/voice/welcome.g726" 1
-/home/rmm "/home/hd1/voice/wait.g726" 1
+/home/rmm "/home/hd1/test/voice/welcome.g726" 1
+/home/rmm "/home/hd1/test/voice/wait.g726" 1
 
 ### start blinking blue led for configuration in progress
 #/home/led_ctl -boff -yon &
@@ -220,6 +225,11 @@ case ${FIRMWARE_LETTER} in
         HTTP_VERSION='M'
         ;;
 
+    B) # Tested :)
+        RTSP_VERSION='M'
+        HTTP_VERSION='M'
+        ;;
+
     # 1.8.5.1
     M)  # Tested :)
         RTSP_VERSION='M'
@@ -236,7 +246,7 @@ case ${FIRMWARE_LETTER} in
         HTTP_VERSION='M'
         ;;
 
-    B|E|F|H|I|J)  # NOT TESTED YET
+    E|F|H|I|J)  # NOT TESTED YET
         RTSP_VERSION='I'
         HTTP_VERSION='J'
         ;;
@@ -261,7 +271,7 @@ log "Debug mode = $(get_config DEBUG)"
 # first, configure wifi
 
 ### Let ppl hear that we start connect wifi
-/home/rmm "/home/hd1/voice/connectting.g726" 1
+/home/rmm "/home/hd1/test/voice/connectting.g726" 1
 
 log "Check for wifi configuration file...*"
 log $(find /home -name "wpa_supplicant.conf")
@@ -271,20 +281,26 @@ res=$(/home/wpa_supplicant -B -i ra0 -c /home/wpa_supplicant.conf )
 log "Status for wifi configuration=$?  (0 is ok)"
 log "Wifi configuration answer: $res"
 
-log "Do network configuration 1/2 (ip and gateway)"
-#ifconfig ra0 192.168.1.121 netmask 255.255.255.0
-#route add default gw 192.168.1.254
-ifconfig ra0 $(get_config IP) netmask $(get_config NETMASK)
-route add default gw $(get_config GATEWAY)
-log "Done"
+if [[ $(get_config DHCP) == "yes" ]] ; then
+    log "Do network configuration (DHCP)"
+    udhcpc --interface=ra0
+    log "Done"
+else
+    log "Do network configuration 1/2 (IP and Gateway)"
+    #ifconfig ra0 192.168.1.121 netmask 255.255.255.0
+    #route add default gw 192.168.1.254
+    ifconfig ra0 $(get_config IP) netmask $(get_config NETMASK)
+    route add default gw $(get_config GATEWAY)
+    log "Done"
+    ### configure DNS (google one)
+    log "Do network configuration 2/2 (DNS)"
+    echo "nameserver $(get_config NAMESERVER)" > /etc/resolv.conf
+    log "Done"
+fi
 
 log "Configuration is :"
 ifconfig | sed "s/^/    /" >> ${LOG_FILE}
 
-### configure DNS (google one)
-log "Do network configuration 2/2 (DNS)"
-echo "nameserver $(get_config NAMESERVER)" > /etc/resolv.conf
-log "Done"
 
 ### configure time on a NTP server
 log "Get time from a NTP server..."
@@ -298,9 +314,10 @@ log "New datetime is $(date)"
 
 
 ### Check if reach gateway and notify
-ping -c1 -W2 $(get_config GATEWAY) > /dev/null
+GATEWAY=$(ip route | awk '/default/ { print $3 }')
+ping -c1 -W2 $GATEWAY > /dev/null
 if [ 0 -eq $? ]; then
-    /home/rmm "/home/hd1/voice/wifi_connected.g726" 1
+    /home/rmm "/home/hd1/test/voice/wifi_connected.g726" 1
 fi
 
 ### set the root password
@@ -310,6 +327,11 @@ root_pwd=$(get_config ROOT_PASSWORD)
 ### start blue led for configuration finished
 log "Start blue led on"
 led -yoff -bon
+
+### Start monitor_wifi script if Cloud is enabled.
+if [[ $(get_config CLOUD) == "yes" ]] ; then
+  /home/monitor_wifi &
+fi
 
 
 ### Rename the timeout sound file to avoid being spammed with chinese audio stuff...
@@ -337,7 +359,8 @@ cat index.html.tpl_header ${TMP_VERSION_FILE} index.html.tpl_footer > index.html
 
 # then, bind the record folder
 mkdir /home/hd1/test/http/record/
-mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
+#Moved bind mount so it fixes the 'No MicroSD' issue in App when cloud is enabled
+
 
 # prepare the GET /motion url
 touch /home/hd1/test/http/motion
@@ -362,6 +385,11 @@ cd /home
 ./record_event &
 ./mp4record 60 &
 
+### Start Cloud if enabled
+if [[ $(get_config CLOUD) == "yes" ]] ; then
+  ./cloud &
+  /home/watch_process &
+fi
 
 ### Some configuration
 
@@ -397,10 +425,11 @@ fi
 ### Final led color
 
 ### Check if reach gateway and notify
-ping -c1 -W2 $(get_config GATEWAY) > /dev/null
+GATEWAY=$(ip route | awk '/default/ { print $3 }')
+ping -c1 -W2 $GATEWAY > /dev/null
 if [ 0 -eq $? ]; then
     led $(get_config LED_WHEN_READY)
-    /home/rmm "/home/hd1/voice/success.g726" 1
+    /home/rmm "/home/hd1/test/voice/success.g726" 1
 else
     led -boff -yfast
 fi
@@ -432,6 +461,9 @@ sleep 5
 log "Processes after startup :"
 ps >> ${LOG_FILE}
 
+### Move Bind Mount here so SD is properly registered in app when cloud is enabled.
+mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
+
 ### List storage status
 log "Storage status :"
 df -h >> ${LOG_FILE}
@@ -439,7 +471,3 @@ df -h >> ${LOG_FILE}
 ### to make sure log are written...
 
 sync
-
-
-
-
