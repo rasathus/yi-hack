@@ -23,7 +23,7 @@ This camera has the default following features :
 This hack includes :
 * ntpclient (set date and time over internet)
 * Base firmware is : M release.
-* no more cloud feature (nothing goes out of your local network)
+* Enable/Disable Cloud (Yi Home App).
 * no more need to use a smartphone application
 * RTSP server activated
 * Telnet server activated

@@ -311,6 +311,11 @@ root_pwd=$(get_config ROOT_PASSWORD)
 log "Start blue led on"
 led -yoff -bon
 
+### Start monitor_wifi script if Cloud is enabled.
+if [[ $(get_config CLOUD) == "yes" ]] ; then
+  /home/monitor_wifi &
+fi
+
 
 ### Rename the timeout sound file to avoid being spammed with chinese audio stuff...
 [ -f /home/timeout.g726 ] && mv /home/timeout.g726 /home/timeout.g726.OFF
@@ -337,7 +342,8 @@ cat index.html.tpl_header ${TMP_VERSION_FILE} index.html.tpl_footer > index.html
 
 # then, bind the record folder
 mkdir /home/hd1/test/http/record/
-mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
+#Moved bind mount so it fixes the 'No MicroSD' issue in App when cloud is enabled
+
 
 # prepare the GET /motion url
 touch /home/hd1/test/http/motion
@@ -362,6 +368,11 @@ cd /home
 ./record_event &
 ./mp4record 60 &
 
+### Start Cloud if enabled
+if [[ $(get_config CLOUD) == "yes" ]] ; then
+  ./cloud &
+  /home/watch_process &
+fi
 
 ### Some configuration
 
@@ -432,6 +443,9 @@ sleep 5
 log "Processes after startup :"
 ps >> ${LOG_FILE}
 
+### Move Bind Mount here so SD is properly registered in app when cloud is enabled.
+mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
+
 ### List storage status
 log "Storage status :"
 df -h >> ${LOG_FILE}
@@ -439,7 +453,3 @@ df -h >> ${LOG_FILE}
 ### to make sure log are written...
 
 sync
-
-
-
-
