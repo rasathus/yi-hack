@@ -21,6 +21,7 @@ This camera has the default following features :
 * no RTSP server in the last firmwares
 
 This hack includes :
+* DHCP or manual network configuration
 * ntpclient (set date and time over internet)
 * Base firmware is : M release.
 * Enable/Disable Cloud (Yi Home App).
@@ -60,11 +61,13 @@ The memory card will so contain :
 Configure the Yi camera on the memory card
 ------------------------------------------
 
-You will need to set a static IP adresse to the camera. To check for the available IPs on your network, you can use the **Fing** application to scan the network on your Android smartphone.
+You will either need to set a static IP address for the camera or use DHCP (set DHCP to 'yes' in **test/yi-hack.cfg**. You still need to enter your wi-fi network information inside **test/wpa_supplicant.conf**).
+
+To check for the available IPs on your network, you can use the **Fing** application to scan the network on your Android smartphone.
 
 To configure the wifi network to use, edit the file **test/wpa_supplicant.conf**.
 
-To configure your IP address, open the file **test/yi-hack.cfg** and set the values.
+To configure your IP address, open the file **test/yi-hack.cfg** and set the values, or set DHCP to 'yes'.
 
 Start the camera
 ----------------

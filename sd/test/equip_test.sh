@@ -59,8 +59,7 @@ log() {
 }
 
 get_config() {
-    key=$1
-    grep $1 /home/hd1/test/yi-hack.cfg  | cut -d"=" -f2
+    grep "^$1=" /home/hd1/test/yi-hack.cfg  | cut -d"=" -f2
 }
 
 
@@ -230,7 +229,7 @@ case ${FIRMWARE_LETTER} in
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         ;;
-        
+
     # 1.8.5.1
     M)  # Tested :)
         RTSP_VERSION='M'
@@ -282,20 +281,26 @@ res=$(/home/wpa_supplicant -B -i ra0 -c /home/wpa_supplicant.conf )
 log "Status for wifi configuration=$?  (0 is ok)"
 log "Wifi configuration answer: $res"
 
-log "Do network configuration 1/2 (ip and gateway)"
-#ifconfig ra0 192.168.1.121 netmask 255.255.255.0
-#route add default gw 192.168.1.254
-ifconfig ra0 $(get_config IP) netmask $(get_config NETMASK)
-route add default gw $(get_config GATEWAY)
-log "Done"
+if [[ $(get_config DHCP) == "yes" ]] ; then
+    log "Do network configuration (DHCP)"
+    udhcpc --interface=ra0
+    log "Done"
+else
+    log "Do network configuration 1/2 (IP and Gateway)"
+    #ifconfig ra0 192.168.1.121 netmask 255.255.255.0
+    #route add default gw 192.168.1.254
+    ifconfig ra0 $(get_config IP) netmask $(get_config NETMASK)
+    route add default gw $(get_config GATEWAY)
+    log "Done"
+    ### configure DNS (google one)
+    log "Do network configuration 2/2 (DNS)"
+    echo "nameserver $(get_config NAMESERVER)" > /etc/resolv.conf
+    log "Done"
+fi
 
 log "Configuration is :"
 ifconfig | sed "s/^/    /" >> ${LOG_FILE}
 
-### configure DNS (google one)
-log "Do network configuration 2/2 (DNS)"
-echo "nameserver $(get_config NAMESERVER)" > /etc/resolv.conf
-log "Done"
 
 ### configure time on a NTP server
 log "Get time from a NTP server..."
@@ -309,7 +314,8 @@ log "New datetime is $(date)"
 
 
 ### Check if reach gateway and notify
-ping -c1 -W2 $(get_config GATEWAY) > /dev/null
+GATEWAY=$(ip route | awk '/default/ { print $3 }')
+ping -c1 -W2 $GATEWAY > /dev/null
 if [ 0 -eq $? ]; then
     /home/rmm "/home/hd1/test/voice/wifi_connected.g726" 1
 fi
@@ -419,7 +425,8 @@ fi
 ### Final led color
 
 ### Check if reach gateway and notify
-ping -c1 -W2 $(get_config GATEWAY) > /dev/null
+GATEWAY=$(ip route | awk '/default/ { print $3 }')
+ping -c1 -W2 $GATEWAY > /dev/null
 if [ 0 -eq $? ]; then
     led $(get_config LED_WHEN_READY)
     /home/rmm "/home/hd1/test/voice/success.g726" 1
