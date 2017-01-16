@@ -114,8 +114,8 @@ cd /home/3518
 himm 0x20050074 0x06802424
 
 ### Let ppl hear that we start
-/home/rmm "/home/hd1/voice/welcome.g726" 1
-/home/rmm "/home/hd1/voice/wait.g726" 1
+/home/rmm "/home/hd1/test/voice/welcome.g726" 1
+/home/rmm "/home/hd1/test/voice/wait.g726" 1
 
 ### start blinking blue led for configuration in progress
 #/home/led_ctl -boff -yon &
@@ -261,7 +261,7 @@ log "Debug mode = $(get_config DEBUG)"
 # first, configure wifi
 
 ### Let ppl hear that we start connect wifi
-/home/rmm "/home/hd1/voice/connectting.g726" 1
+/home/rmm "/home/hd1/test/voice/connectting.g726" 1
 
 log "Check for wifi configuration file...*"
 log $(find /home -name "wpa_supplicant.conf")
@@ -300,7 +300,7 @@ log "New datetime is $(date)"
 ### Check if reach gateway and notify
 ping -c1 -W2 $(get_config GATEWAY) > /dev/null
 if [ 0 -eq $? ]; then
-    /home/rmm "/home/hd1/voice/wifi_connected.g726" 1
+    /home/rmm "/home/hd1/test/voice/wifi_connected.g726" 1
 fi
 
 ### set the root password
@@ -411,7 +411,7 @@ fi
 ping -c1 -W2 $(get_config GATEWAY) > /dev/null
 if [ 0 -eq $? ]; then
     led $(get_config LED_WHEN_READY)
-    /home/rmm "/home/hd1/voice/success.g726" 1
+    /home/rmm "/home/hd1/test/voice/success.g726" 1
 else
     led -boff -yfast
 fi
