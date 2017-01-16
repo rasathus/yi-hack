@@ -226,6 +226,11 @@ case ${FIRMWARE_LETTER} in
         HTTP_VERSION='M'
         ;;
 
+    B) # Tested :)
+        RTSP_VERSION='M'
+        HTTP_VERSION='M'
+        ;;
+        
     # 1.8.5.1
     M)  # Tested :)
         RTSP_VERSION='M'
@@ -242,7 +247,7 @@ case ${FIRMWARE_LETTER} in
         HTTP_VERSION='M'
         ;;
 
-    B|E|F|H|I|J)  # NOT TESTED YET
+    E|F|H|I|J)  # NOT TESTED YET
         RTSP_VERSION='I'
         HTTP_VERSION='J'
         ;;
