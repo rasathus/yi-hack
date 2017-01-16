@@ -87,7 +87,13 @@ echo "$(get_config TIMEZONE)" > /etc/TZ
 
 ### get time is done after wifi configuration!
 
-
+# Regardless of network configuration, the Yi also listens on 192.168.1.128 using eth0
+# this can cause problems on the network if another device has that IP
+# `ifconfig eth0 down` doesn't seem to do anything except hide eth0 from `ifconfig` output
+# so manually remove the configured IP by setting it to 0.0.0.0
+log "Disabling eth0"
+ifconfig eth0 0.0.0.0
+ifconfig eth0 down
 
 ### first, let's do as the orignal script does....
 
