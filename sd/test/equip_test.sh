@@ -126,9 +126,32 @@ himm 0x20050074 0x06802424
 #/home/led_ctl -boff -yon &
 led -yoff -bfast
 
+bcmver="bd1e"
+bcmver1="0bdc"
+bcmcmd=$(lsusb|grep "0a5c"|cut -d':' -f3)
 
-insmod /home/mtprealloc7601Usta.ko
-insmod /home/mt7601Usta.ko
+if [ $bcmver = $bcmcmd ];then
+    echo 1 > /tmp/isbcm
+    #/home/bcm/nvram set /home/bcm/nvram.bin
+    /home/bcm/nvram get
+    mount -t usbfs none /proc/bus/usb
+    /home/bcm/bcmdl -n /tmp/nvram.bin /home/bcm/fw_bcmdhd_xy_r2.bin.trx -C 5
+    insmod /home/bcm/bcmdhd.ko iface_name=ra0
+    echo "BCM 43143:bd1e"
+elif [ $bcmver1 = $bcmcmd ];then
+    echo 1 > /tmp/isbcm
+    #/home/bcm/nvram set /home/bcm/nvram.bin
+    /home/bcm/nvram get
+    mount -t usbfs none /proc/bus/usb
+    /home/bcm/bcmdl -n /tmp/nvram.bin /home/bcm/fw_bcmdhd_xy_r2.bin.trx -C 5
+    insmod /home/bcm/bcmdhd.ko iface_name=ra0
+    echo "BCM 43143:0bdc"
+else
+    echo 1 > /tmp/ismtk
+    insmod /home/mtprealloc7601Usta.ko
+    insmod /home/mt7601Usta.ko
+    echo "MTK 7601"
+fi
 
 ifconfig ra0 up
 
