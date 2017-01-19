@@ -328,12 +328,6 @@ root_pwd=$(get_config ROOT_PASSWORD)
 log "Start blue led on"
 led -yoff -bon
 
-### Start monitor_wifi script if Cloud is enabled.
-if [[ $(get_config CLOUD) == "yes" ]] ; then
-  /home/monitor_wifi &
-fi
-
-
 ### Rename the timeout sound file to avoid being spammed with chinese audio stuff...
 [ -f /home/timeout.g726 ] && mv /home/timeout.g726 /home/timeout.g726.OFF
 
@@ -378,7 +372,17 @@ ps | grep server | grep -v grep | grep -v log_server >> ${LOG_FILE}
 
 sync
 
+### Start monitor_wifi script if Cloud is enabled.
+if [[ $(get_config CLOUD) == "yes" ]] ; then
+  /home/monitor_wifi &
+fi
 
+### Rmm stuff
+# without this, most things does not work (http server, rtsp)
+# It starts to use the cloud (which is no more launched) so you will find timeout in the logs
+# This must be launched after all "/home/rmm" command calls
+cd /home
+./rmm &
 
 ### Launch record event
 cd /home
@@ -429,18 +433,11 @@ GATEWAY=$(ip route | awk '/default/ { print $3 }')
 ping -c1 -W2 $GATEWAY > /dev/null
 if [ 0 -eq $? ]; then
     led $(get_config LED_WHEN_READY)
-    /home/rmm "/home/hd1/test/voice/success.g726" 1
+    # Disable since RMM has already been called to finish.
+    #/home/rmm "/home/hd1/test/voice/success.g726" 1
 else
     led -boff -yfast
 fi
-
-### Rmm stuff
-# without this, most things does not work (http server, rtsp)
-# It starts to use the cloud (which is no more launched) so you will find timeout in the logs
-# This must be launched after all "/home/rmm" command calls
-cd /home
-./rmm &
-
 
 ### Rtsp server
 cd /home/hd1/test/
