@@ -242,13 +242,13 @@ echo "Firmware letter is : '${FIRMWARE_LETTER}'" >> ${TMP_VERSION_FILE}
 cat ${TMP_VERSION_FILE} >> ${LOG_FILE}
 
 case ${FIRMWARE_LETTER} in
-    # 1.8.6.1
-    A)  # NOT TESTTED YET
+    # 1.8.7.0
+    A)  # Tested :)
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         ;;
-
-    B) # Tested :)
+    # 1.8.6.1
+    B)  # Tested :)
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         ;;
