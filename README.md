@@ -47,7 +47,7 @@ Prepare the memory card
 
 Clone this repository on a computer :
 
-    git clone http://github.com/fritz-smh/yi-hack.git
+    git clone http://github.com/death2all110/yi-hack.git
 
 Then, format a micro SD card in fat32 (vfat) format and copy the content of the **yi-hack/sd/** folder at the root of your memory card.
 
