@@ -313,7 +313,7 @@ log "Wifi configuration answer: $res"
 
 if [[ $(get_config DHCP) == "yes" ]] ; then
     log "Do network configuration (DHCP)"
-    my_gateway=$(udhcpc --interface=ra0 | grep "Adding Router" | awk '{print $3}' | tr -d '\n')
+    my_gateway=$(udhcpc --interface=ra0 | grep "Adding router" | awk '{print $3}' | tr -d '\n')
     log "Default Router is $my_gateway"
     log "Done"
 else
@@ -346,7 +346,7 @@ log "New datetime is $(date)"
 
 
 ### Check if reach gateway and notify
-GATEWAY=$(ip route | awk '/default/ { print $3 }')
+#GATEWAY=$(ip route | awk '/default/ { print $3 }')
 ping -c1 -W2 $my_gateway > /dev/null
 if [ 0 -eq $? ]; then
     boot_voice "/home/hd1/test/voice/wifi_connected.g726" 1
@@ -465,7 +465,7 @@ fi
 ### Final led color
 
 ### Check if reach gateway and notify
-GATEWAY=$(ip route | awk '/default/ { print $3 }')
+#GATEWAY=$(ip route | awk '/default/ { print $3 }')
 ping -c1 -W2 $my_gateway > /dev/null
 if [ 0 -eq $? ]; then
     led $(get_config LED_WHEN_READY)
