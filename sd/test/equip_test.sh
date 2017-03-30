@@ -313,7 +313,8 @@ log "Wifi configuration answer: $res"
 
 if [[ $(get_config DHCP) == "yes" ]] ; then
     log "Do network configuration (DHCP)"
-    udhcpc --interface=ra0
+    my_gateway=$(udhcpc --interface=ra0 | grep "Adding Router" | awk '{print $3}' | tr -d '\n')
+    log "Default Router is $my_gateway"
     log "Done"
 else
     log "Do network configuration 1/2 (IP and Gateway)"
@@ -321,6 +322,7 @@ else
     #route add default gw 192.168.1.254
     ifconfig ra0 $(get_config IP) netmask $(get_config NETMASK)
     route add default gw $(get_config GATEWAY)
+    my_gateway=$(get_config GATEWAY)
     log "Done"
     ### configure DNS (google one)
     log "Do network configuration 2/2 (DNS)"
@@ -345,7 +347,7 @@ log "New datetime is $(date)"
 
 ### Check if reach gateway and notify
 GATEWAY=$(ip route | awk '/default/ { print $3 }')
-ping -c1 -W2 $GATEWAY > /dev/null
+ping -c1 -W2 $my_gateway > /dev/null
 if [ 0 -eq $? ]; then
     boot_voice "/home/hd1/test/voice/wifi_connected.g726" 1
 fi
@@ -460,7 +462,7 @@ fi
 
 ### Check if reach gateway and notify
 GATEWAY=$(ip route | awk '/default/ { print $3 }')
-ping -c1 -W2 $GATEWAY > /dev/null
+ping -c1 -W2 $my_gateway > /dev/null
 if [ 0 -eq $? ]; then
     led $(get_config LED_WHEN_READY)
     # Disable since RMM has already been called to finish.
