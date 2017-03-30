@@ -421,6 +421,10 @@ cd /home
 ./record_event &
 ./mp4record 60 &
 
+### Start motion detection & reporting
+log "Starting motion notification processes"
+/home/hd1/test/check_motion.sh $(get_config MOTION_NOTIFICATION_URL) > /${LOG_DIR}/log_motion.txt 2>&1 &
+
 ### Start Cloud if enabled
 if [[ $(get_config CLOUD) == "yes" ]] ; then
   ./cloud &
@@ -485,8 +489,6 @@ ps | grep rtspsvr | grep -v grep >> ${LOG_FILE}
 
 sleep 5
 
-###Start check_motion.sh script
-/home/hd1/test/check_motion.sh &
 
 ### List the processes after startup
 log "Processes after startup :"
