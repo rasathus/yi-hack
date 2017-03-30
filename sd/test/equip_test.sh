@@ -62,6 +62,13 @@ get_config() {
     grep "^$1=" /home/hd1/test/config/yi-hack.cfg  | cut -d"=" -f2
 }
 
+boot_voice() {
+    voice_file=$1
+    if [ "$(get_config BOOT_VOICE)" = "yes" ]; then
+        /home/rmm "$voice_file" 1
+    fi
+}
+
 
 
 ### first we assume that this script is started from /home/init.sh and will replace it from the below lines (which are not commented in init.sh :
@@ -119,8 +126,8 @@ cd /home/3518
 himm 0x20050074 0x06802424
 
 ### Let ppl hear that we start
-/home/rmm "/home/hd1/test/voice/welcome.g726" 1
-/home/rmm "/home/hd1/test/voice/wait.g726" 1
+boot_voice "/home/hd1/test/voice/welcome.g726" 1
+boot_voice "/home/hd1/test/voice/wait.g726" 1
 
 ### start blinking blue led for configuration in progress
 #/home/led_ctl -boff -yon &
@@ -294,7 +301,7 @@ log "Debug mode = $(get_config DEBUG)"
 # first, configure wifi
 
 ### Let ppl hear that we start connect wifi
-/home/rmm "/home/hd1/test/voice/connectting.g726" 1
+boot_voice "/home/hd1/test/voice/connectting.g726" 1
 
 log "Check for wifi configuration file...*"
 log $(find /home -name "wpa_supplicant.conf")
@@ -340,7 +347,7 @@ log "New datetime is $(date)"
 GATEWAY=$(ip route | awk '/default/ { print $3 }')
 ping -c1 -W2 $GATEWAY > /dev/null
 if [ 0 -eq $? ]; then
-    /home/rmm "/home/hd1/test/voice/wifi_connected.g726" 1
+    boot_voice "/home/hd1/test/voice/wifi_connected.g726" 1
 fi
 
 ### set the root password
@@ -476,6 +483,8 @@ ps | grep rtspsvr | grep -v grep >> ${LOG_FILE}
 
 sleep 5
 
+###Start check_motion.sh script
+/home/hd1/test/check_motion.sh &
 
 ### List the processes after startup
 log "Processes after startup :"
