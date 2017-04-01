@@ -459,6 +459,9 @@ crontab_folder="/var/spool/cron/crontabs"
 if [ ! -r "$crontab_folder" ]; then
     mkdir -p "$crontab_folder"
 fi
+if [ ! -r "/var/spool/cron/crontabs/root" ]; then
+    cp /home/hd1/test/crontabs_root /var/spool/cron/crontabs/root
+fi
 # Start crond daemon
 /usr/sbin/crond -b
 
