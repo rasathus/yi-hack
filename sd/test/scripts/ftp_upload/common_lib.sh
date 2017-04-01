@@ -2,7 +2,7 @@
 
 DEFAULT_SCRIPT_DIR="/tmp/hd1/test/scripts"
 DEFAULT_RECORD_DIR="/tmp/hd1/record/"
-DEFAULT_CONFIG_FILE="/home/hd1/test/yi-hack.cfg"
+DEFAULT_CONFIG_FILE="/home/hd1/test/config/yi-hack.cfg"
 
 max_d01=31
 max_d02=28
@@ -35,7 +35,7 @@ led() {
 
 }
 
-get_config() 
+get_config()
 {
     param=$1
     conf_file=${2-"$DEFAULT_CONFIG_FILE"}
@@ -43,7 +43,7 @@ get_config()
     if [ $count -gt 1 ]; then
         log "ERROR: Found $count line for ${param}"
     fi
-    
+
     grep -e ^\s*${param}\s* $conf_file  | cut -d"=" -f2
 }
 
@@ -164,4 +164,3 @@ check_offline_duration()
     fi
     return 0
 }
-
