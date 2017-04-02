@@ -421,6 +421,19 @@ cd /home
 ./record_event &
 ./mp4record 60 &
 
+### cURL stuff.
+# check_motion.sh requires curl.
+# Checks if curl exists, if so does nothing.
+log "Checking for cURL binary..."
+if [ ! -r "/home/curl" ]; then
+    log "cURL binary not found! Copying cURL binary to /home/curl."
+    cp /home/hd1/test/curl /home/curl
+    chmod 0775 /home/curl
+else
+    log "cURL binary already exists"
+fi
+
+
 ### Start motion detection & reporting
 log "Starting motion notification processes"
 /home/hd1/test/check_motion.sh $(get_config MOTION_NOTIFICATION_URL) > /${LOG_DIR}/log_motion.txt 2>&1 &
