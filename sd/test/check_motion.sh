@@ -4,6 +4,7 @@
 # Since file writes begin immediately on motion detected, and don't end until approx 1min after motion ends, we only need to look for files modified very recently
 # Relies on running mp4record process
 
+chmod -R 0775 /home/hd1/record/
 cd /home/hd1/record/
 touch last_motion_check
 sleep 5 # since we /just/ created last_motion_check, the first check can return a false negative unless we wait a beat
@@ -20,6 +21,7 @@ while true; do
 
 	motion_file=$(find . -type f -name "*.mp4" -mmin -1 | tail -1)
 	echo "Motion file: $motion_file"
+	chmod -R 0775 /home/hd1/test/http/
 	echo $motion_file | sed "s/.\//record\//" > /home/hd1/test/http/motion
 	sleep 20
 done
