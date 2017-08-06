@@ -1,0 +1,3 @@
+- platform: ping
+  name: Frontdoor Camera Online
+  host: <Camera IP Address>

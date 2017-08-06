@@ -11,9 +11,11 @@ GATEWAY=192.168.1.254
 NAMESERVER=192.168.1.254
 
 ### Motion notifications
-# Optionally POST a JSON message of the status of motion detection to a URL
-# Values : URL to POST notification to, or leave empty to disable
-MOTION_NOTIFICATION_URL=
+DROPBOX_TOKEN=""
+TLS_PROXY_URL="http://192.168.1.10"
+HA_API_URL="http://192.168.1.10:8123"
+HA_SENSOR="sensor.frontdoor_motion"
+HA_AUTH_TOKEN="" # Optional HomeAssistant password
 
 ### Led color after full boot
 # The sequence will be :

@@ -2,7 +2,11 @@
 Yi-hack project
 ===============
 
-Forked from fritz-smh/yi-hack.
+Forked from death2all110/yi-hack which was forked from fritz-smh/yi-hack.
+
+I've added some rough and ready additions to support publish of a homeassistant sensor to track the motion state of the camera, and implemented upload of videos to dropbox.  This provides a replacement for some of the factory cloud integration functionality.
+
+NOTE: Dropbox requires TLS which isn't supported by the camera's curl binary, until I have time to recompile it, all traffic from the camera needs to be proxied by an nginx instances to transparently upgrade the connection to TLS.
 
 Purpose
 =======
@@ -31,6 +35,8 @@ This hack includes :
 * HTTP server activated
 * FTP server activated
 * No more (chinese) voices on startup
+* HomeAssistant Sensor State
+* Dropbox video upload
 
 Warning about some models that are usable only in China
 =======================================================
@@ -68,6 +74,8 @@ To check for the available IPs on your network, you can use the **Fing** applica
 To configure the wifi network to use, copy **test/config/wpa_supplicant.conf.example** to **test/config/wpa_supplicant.conf** and edit it.
 
 To configure your IP address, copy **test/config/yi-hack.cfg.example** to **test/config/yi-hack.cfg** and set the values, or set DHCP to 'yes'.
+
+You will need to setup your nginx proxy using the example config provided.  This transparently proxies traffic between the camera and dropbox, transparently upgrading the insecure connection to a TLS connection.
 
 Start the camera
 ----------------

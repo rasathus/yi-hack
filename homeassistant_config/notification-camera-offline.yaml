@@ -1,0 +1,17 @@
+alias: Send notification if the camera has been offline for 5 minutes
+hide_entity: True
+trigger:
+  platform: state
+  entity_id: binary_sensor.frontdoor_camera_online
+  from: 'on'
+  to: 'off'
+  for:
+    # hours: 1
+    minutes: 5
+    # seconds: 5
+action:
+  - alias: Send a notification
+    service: notify.chris
+    data:
+      title: "Frontdoor Camera Offline"
+      message: "The frontdoor camera has been offline for 5 minutes."

@@ -433,10 +433,10 @@ else
     log "cURL binary already exists"
 fi
 
-
 ### Start motion detection & reporting
 log "Starting motion notification processes"
-/home/hd1/test/check_motion.sh $(get_config MOTION_NOTIFICATION_URL) > /${LOG_DIR}/log_motion.txt 2>&1 &
+# /home/hd1/test/check_motion.sh $(get_config MOTION_NOTIFICATION_URL) > /${LOG_DIR}/log_motion.txt 2>&1 &
+/home/hd1/test/homeassistant_integration.sh $(get_config DROPBOX_TOKEN) $(get_config TLS_PROXY_URL) $(get_config HA_API_URL) $(get_config HA_SENSOR) $(get_config HA_AUTH_TOKEN) > /${LOG_DIR}/log_motion.txt 2>&1 &
 
 ### Start Cloud if enabled
 if [[ $(get_config CLOUD) == "yes" ]] ; then
