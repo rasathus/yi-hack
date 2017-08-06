@@ -197,7 +197,8 @@ home                           Official firmware
 test/                          Yi hack folder
   yi-hack.cfg                  Yi hack configuration file
   equip_test.sh                This script is called on camera startup and will launch all the needed processes
-  check_motion.sh              This script will check each minute if a motion video has been recorded and fill the **motion** file of the http server
+  check_motion.sh              This script is commented out. This check each minute if a motion video has been recorded and fill the **motion** file of the http server
+  homeassistant_integration.sh This script will check every 10 seconds for motion files, and will notify homeassistant and upload the video to dropbox
   rtspsrvK|L|M                 The various RTSP server binary releases (the final letter is corresponding to the firmware)
   http/                        HTTP server folder
     index.html                 HTTP server home page
@@ -219,3 +220,10 @@ check_motion.sh
 Script that runs from equip_test.sh and tell us if a new video was created in the last minute (a video file is created in case of motion detection).
 
 If a file is found, it adds the name of the file to the section GET /motion on the http server.
+
+homeassistant_integration.sh
+---------------
+
+Script that runs from equip_test.sh and tell us if a new video was created in the last minute (a video file is created in case of motion detection).
+
+If a file is found, HomeAssistant is notified and the video is uploaded to dropbox via a TLS upgrade proxy.
