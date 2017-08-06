@@ -1,0 +1,12 @@
+alias: Send notification if the camera reports an error
+hide_entity: True
+trigger:
+  platform: state
+  entity_id: sensor.frontdoor_motion
+  to: 'error'
+action:
+  - alias: Send a notification
+    service: notify.chris
+    data:
+      title: "Front Door Camera in Error"
+      message: "The front door camera is reporting an error, investigation required."

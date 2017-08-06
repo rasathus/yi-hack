@@ -1,0 +1,13 @@
+alias: Send notification if motion is detected at the door
+hide_entity: True
+trigger:
+  platform: state
+  entity_id: sensor.frontdoor_motion
+  from: 'false'
+  to: 'true'
+action:
+  - alias: Send a notification
+    service: notify.chris
+    data:
+      title: "Motion @ the Front Door"
+      message: "Motion detected at the front door @ {{ now().strftime('%H:%M:%S') }}"
